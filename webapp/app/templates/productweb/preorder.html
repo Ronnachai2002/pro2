@@ -1,0 +1,58 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="{% static 'css/preorder.css' %}">
+<title>รายการ Order</title>
+</head>
+<body>
+    {% include 'base/tab_login.html' %}
+    {% include 'app/components/site_header.html' %}
+  <h1>รายการ Order</h1>
+  <button onclick="followWork()">ติดตามการทำงาน</button>
+  <table>
+    <thead>
+      <tr>
+        <th>เวลาสั่งซื้อ</th>
+        <th>ชื่อผู้สั่ง</th>
+        <th>เบอร์โทรศัพท์</th>
+        <th>ที่อยู่</th>
+        <th>ชื่อป้าย</th>
+        <th>ขนาด</th>
+        <th>แบบป้าย</th>
+        <th>รายละเอียดเพิ่มเติม</th>
+        <th>ไฟล์งานเพิ่มเติม</th>
+      </tr>
+    </thead>
+    <tbody>
+        {% for order in orders %}
+        <tr>
+            <td>{{ order.created_at }}</td>
+          <td>{{ order.user_profile.first_name }} {{ order.user_profile.last_name }}</td>
+          <td>{{ order.user_profile.phone_number }}</td>
+          <td>{{ order.user_profile.address }}</td>
+          <td>{{ order.name }}</td>
+          <td>{{ order.get_category_display }}</td>
+          <td>{{ order.get_material_display }}</td>
+          <td>{{ order.message }}</td>
+          <td>
+            {% if order.attachment %}
+            <a href="{{ order.attachment.url }}">ดาวน์โหลด</a>
+            {% else %}
+            N/A
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+  </table>
+
+  <script>
+    function followWork() {
+      alert("ยังไม่ทำหน้าติดตามการทำงาน");
+    }
+  </script>
+</body>
+</html>
