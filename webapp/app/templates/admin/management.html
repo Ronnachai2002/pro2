@@ -14,8 +14,9 @@
     <nav>
         <a href="{% url 'home' %}">หน้าหลัก</a>
         <a href="{% url 'management' %}">จัดการผู้ใช้</a>
-        <a href="#">รายงาน</a>
-        <!-- เพิ่มลิงก์หรือเมนูที่คุณต้องการ -->
+        {% if order.id %}
+        <a href="{% url 'admin_update_order_status' order.id %}">รายงาน</a>
+        {% endif %}
     </nav>
     <br>
     <a href="{% url 'user_management' %}">User Management</a>

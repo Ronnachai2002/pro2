@@ -17,6 +17,7 @@ from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.db import transaction
 from django.utils import timezone
+from django.contrib.admin.views.decorators import staff_member_required
 
 
 def home(req):
@@ -31,9 +32,47 @@ def signout(request):
     logout(request)
     return redirect('home')
 
+@login_required
+def admin_order_list(request):
+    orders = Order.objects.all()
+    return render(request, 'admin/order_list.html', {'orders': orders})
+
+
+def update_order_status(request, order_id):
+    if request.method == 'POST':
+        new_status = request.POST.get('status')
+        order = get_object_or_404(Order, id=order_id)
+        order.status = new_status
+        order.save()
+        messages.success(request, 'อัพเดทสถานะคำสั่งซื้อเรียบร้อยแล้ว')
+        # Redirect to the admin order list after updating the status
+        return redirect('admin_order_list')
+    else:
+        messages.error(request, 'การอัพเดทสถานะคำสั่งซื้อล้มเหลว')
+        # Redirect to the admin order list if the request method is not POST
+        return redirect('admin_order_list')
+
+def view_order(request, order_id):
+    order = get_object_or_404(Order, pk=order_id)
+    return render(request, 'admin/view_order.html', {'order': order})
+
+@login_required
+def track_order(request, order_id):
+    # Check if the user has a user profile
+    if hasattr(request.user, 'userprofile'):
+        # Retrieve the order
+        order = get_object_or_404(Order, id=order_id, user_profile=request.user.userprofile)
+        # Pass the order status to the template
+        order_status = order.get_status_display()
+        return render(request, 'productweb/track_order.html', {'order': order, 'order_status': order_status})
+    else:
+        return render(request, 'app/no_profile.html')
+
+
 
 def admin1(request):
-    return render(request, 'admin/admin1.html', {'user': request.user})
+    orders = Order.objects.all()
+    return render(request, 'admin/admin1.html', {'orders': orders})
 
 
 def management(request):
@@ -260,10 +299,15 @@ def order6(request):
     return render(request, 'productweb/order6.html')
 
 @login_required
-def preorder(req):
-    current_user = req.user
-    orders = Order.objects.filter(user_profile__user=current_user).order_by('-created_at')
-    return render(req, 'productweb/preorder.html', {'orders': orders})
+def preorder(request, order_id=None):
+    if order_id:
+        # If order_id is provided, redirect to track_order view
+        return redirect('track_order', order_id=order_id)
+    else:
+        # Fetch all orders for the current user
+        current_user = request.user
+        orders = Order.objects.filter(user_profile__user=current_user).order_by('-created_at')
+        return render(request, 'productweb/preorder.html', {'orders': orders})
 
 def delete_product(request, product_id):
     cart_item = get_object_or_404(Detailcart, id=product_id)
@@ -271,3 +315,9 @@ def delete_product(request, product_id):
         cart_item.delete()
         return redirect('cart') 
     return render(request, 'productweb/delete_product.html', {'product': cart_item})
+
+
+
+
+
+    

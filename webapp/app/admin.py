@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Item, ItemImage
+from .models import *
 
 class ItemImageInline(admin.TabularInline):  # หรือ admin.StackedInline ตามที่คุณต้องการ
     model = ItemImage
@@ -8,5 +8,5 @@ class ItemImageInline(admin.TabularInline):  # หรือ admin.StackedInline 
 class ItemAdmin(admin.ModelAdmin):
     inlines = [ItemImageInline]
 
-# Register your models here.
 admin.site.register(Item, ItemAdmin)
+

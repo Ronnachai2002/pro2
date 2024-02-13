@@ -44,3 +44,9 @@ class Order(models.Model):
     message = models.TextField()
     attachment = models.FileField(upload_to='order_attachments', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=50, choices=[('รอดำเนินการ', 'รอดำเนินการ'), ('กำลังดำเนินการ', 'กำลังดำเนินการ'), ('จัดส่งแล้ว', 'จัดส่งแล้ว'), ('จัดส่งเรียบร้อย', 'จัดส่งเรียบร้อย')])
+
+
+    def __str__(self):
+        return f"Order {self.id}: {self.name} ({self.get_status_display()})"
+
