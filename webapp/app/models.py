@@ -1,6 +1,7 @@
 from django.db import models
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -12,7 +13,7 @@ class UserProfile(models.Model):
     address = models.TextField(null=True, blank=True)
     birth_date = models.DateField(null=True, blank=True)
     pass1 = models.CharField(max_length=100, null=True, blank=True)
-    
+
     def __str__(self):
         return self.user.username
     
@@ -39,14 +40,37 @@ class Detailcart(models.Model):
 class Order(models.Model):
     user_profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
-    category = models.CharField(max_length=2, choices=[('A0', 'A0'), ('A1', 'A1'), ('A2', 'A2'), ('A3', 'A3'), ('A4', 'A4')])
-    material = models.CharField(max_length=50, choices=[('Vinyl', 'ป้ายไวนิลธงญี่ปุ่น'), ('Acrylic', 'ป้ายไวนิลโครงไม้/โครงเหล็ก'), ('Metal', 'ป้ายกล่องไฟไวนิล'), ('Wood', 'สติกเกอร์อิงค์เจ็ท'), ('Foamboard', 'แคนวาสอิงค์เจ็ท')])
+    category = models.CharField(max_length=50)  
+    material = models.CharField(max_length=50)
     message = models.TextField()
     attachment = models.FileField(upload_to='order_attachments', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    status = models.CharField(max_length=50, choices=[('รอดำเนินการ', 'รอดำเนินการ'), ('กำลังดำเนินการ', 'กำลังดำเนินการ'), ('จัดส่งแล้ว', 'จัดส่งแล้ว'), ('จัดส่งเรียบร้อย', 'จัดส่งเรียบร้อย')])
-
+    status = models.CharField(max_length=50, choices=[('รอดำเนินการ', 'รอดำเนินการ'), ('กำลังดำเนินการ', 'กำลังดำเนินการ'), ('ดำเนินการเสร็จสิ้น', 'ดำเนินการเสร็จสิ้น'), ('จัดส่งแล้ว', 'จัดส่งแล้ว'), ('จัดส่งเรียบร้อย', 'จัดส่งเรียบร้อย')])    
 
     def __str__(self):
         return f"Order {self.id}: {self.name} ({self.get_status_display()})"
 
+class Message(models.Model):
+    sender = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='sent_messages')
+    receiver = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='received_messages')
+    content = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+class Payment(models.Model):
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='payment_slips', null=True, blank=True)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    is_verified = models.BooleanField(default=False)
+    status = models.CharField(max_length=50, choices=[
+        ('pending', 'รอตรวจสอบ'),
+        ('verified', 'ชำระเงินเรียบร้อย'),
+        ('rejected', 'การชำระเงินถูกปฏิเสธ')
+    ], default='pending')
+    price = models.DecimalField(max_digits=10, decimal_places=2)  # เพิ่มฟิลด์ราคา
+
+
+
+
+
+    

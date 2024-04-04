@@ -13,7 +13,7 @@
     <div class="container">
         <h1>ติดตามคำสั่งซื้อ</h1>
         <p><strong>สถานะการทำงาน:</strong> {{ order_status }}</p>
-        <p><strong>เลขคำสั่งซื้อ:</strong> {{ order.id }}</p>
+        <p><strong>เลขคำสั่งซื้อ:</strong> {{ order.id }}</p>  
         <a href="{% url 'view_order' order_id=order.id %}">ดูรายละเอียดคำสั่งซื้อ</a>
     </div>
 </body>

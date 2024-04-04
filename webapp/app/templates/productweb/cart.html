@@ -28,7 +28,7 @@
                 <td>{{ item.amount }}</td>
                 <td><input type="checkbox" name="selected_item" value="{{ item.id }}" onclick="limitCheckboxSelection(this)"></td>
                 <td>
-                    <form action="{% url 'delete_product' item.id %}" method="post">
+                    <form action="{% url 'delete_product_incart' item.id %}" method="post">
                         {% csrf_token %}
                         <button type="submit">ลบรายการ</button>
                     </form>

@@ -106,7 +106,8 @@ STATICFILES_DIRS = [
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_ROOT = BASE_DIR / "media"
 
-MEDIA_URL = 'productweb/media/'
 MEDIA_URL = 'app/media/'
 
 TIME_ZONE = 'Asia/Bangkok'
+
+

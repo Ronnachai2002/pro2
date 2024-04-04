@@ -1,0 +1,139 @@
+<!-- payment_tracking.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Tracking</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            color: #333;
+            font-weight: bold;
+        }
+
+        img {
+            display: block;
+            margin: auto;
+        }
+
+        .status {
+            text-align: center;
+        }
+
+        .status.pending {
+            color: #f39c12;
+        }
+
+        .status.verified {
+            color: #2ecc71;
+        }
+
+        .status.rejected {
+            color: #e74c3c;
+        }
+
+        .upload-button {
+            text-align: center;
+        }
+
+        .upload-button input[type="file"] {
+            display: none;
+        }
+
+        .upload-button label {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: #3498db;
+            color: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    {% include 'base/tab_login.html' %}
+    {% include 'app/components/site_header.html' %}
+    <h1>การติดตามการชำระเงินของคุณ</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>รูป</th>
+                <th>เลขคำสั่งซื้อ</th>
+                <th>สถานะ</th>
+                <th>วันที่อัปโหลด</th>
+                <th>ราคา</th>
+                <th>การดำเนินการ</th>
+                <th>ลบใบเสร็จ</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for payment in user_payments %}
+            <tr>
+                <td>
+                    {% if payment.image %}
+                    <img src="{{ payment.image.url }}" alt="Payment Slip" width="100">
+                    {% else %}
+                    ยังไม่มีรูปใบเสร็จ
+                    {% endif %}
+                </td>
+                <td>{{ payment.order.id }}</td>
+                <td class="status {{ payment.status }}">{{ payment.get_status_display }}</td>
+                <td>{{ payment.uploaded_at }}</td>
+                <td>{{ payment.price }}</td>
+                <td>
+                    {% if not payment.is_verified %}
+                    <form action="{% url 'upload_payment_image' %}" method="post" enctype="multipart/form-data"> <!-- เพิ่ม enctype="multipart/form-data" -->
+                        {% csrf_token %}
+                        <input type="hidden" name="order_id" value="{{ payment.id }}">
+                        <div class="button">
+                            <input type="file" name="image"> <!-- ลบ attribute multiple -->
+                            <button type="submit">ยืนยันใบเสร็จ</button>
+                        </div>
+                    </form>
+                    {% else %}
+                    <a href="{% url 'payment_detail' payment.order.id %}">ดูรายละเอียดการชำระเงิน</a>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if payment.image %}
+                    <img src="{{ payment.image.url }}" alt="Payment Slip" width="100">
+                    <br>
+                    <a href="{% url 'delete_payment_image' payment.id %}">ลบรูปภาพ</a>
+                    {% else %}
+                    ยังไม่มีรูปใบเสร็จ
+                    {% endif %}
+                </td>
+                
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

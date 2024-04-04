@@ -9,4 +9,7 @@ class ItemAdmin(admin.ModelAdmin):
     inlines = [ItemImageInline]
 
 admin.site.register(Item, ItemAdmin)
-
+admin.site.register(UserProfile)
+admin.site.register(Message)
+admin.site.register(Payment)
+admin.site.register(Order)

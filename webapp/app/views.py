@@ -1,10 +1,11 @@
 import datetime
+import os
 from django.shortcuts import render, redirect 
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth import authenticate,logout,login as auth_login
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseForbidden, HttpResponseRedirect , JsonResponse
+from django.http import Http404, HttpResponseForbidden, HttpResponseRedirect , JsonResponse
 from django.template import RequestContext
 from django.db import IntegrityError
 from .models import *
@@ -12,12 +13,14 @@ from .forms import *
 from datetime import datetime
 from django.shortcuts import get_object_or_404, render, redirect, HttpResponse
 from django.contrib import messages
-from app.models import *
+from .models import *
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.db import transaction
+from django.db.models import Q
 from django.utils import timezone
 from django.contrib.admin.views.decorators import staff_member_required
+from django.views.decorators.http import require_POST
 
 
 def home(req):
@@ -45,11 +48,9 @@ def update_order_status(request, order_id):
         order.status = new_status
         order.save()
         messages.success(request, 'อัพเดทสถานะคำสั่งซื้อเรียบร้อยแล้ว')
-        # Redirect to the admin order list after updating the status
         return redirect('admin_order_list')
     else:
         messages.error(request, 'การอัพเดทสถานะคำสั่งซื้อล้มเหลว')
-        # Redirect to the admin order list if the request method is not POST
         return redirect('admin_order_list')
 
 def view_order(request, order_id):
@@ -58,11 +59,8 @@ def view_order(request, order_id):
 
 @login_required
 def track_order(request, order_id):
-    # Check if the user has a user profile
     if hasattr(request.user, 'userprofile'):
-        # Retrieve the order
         order = get_object_or_404(Order, id=order_id, user_profile=request.user.userprofile)
-        # Pass the order status to the template
         order_status = order.get_status_display()
         return render(request, 'productweb/track_order.html', {'order': order, 'order_status': order_status})
     else:
@@ -140,7 +138,6 @@ def login(request):
 @login_required
 def edit_profile(request):
     user_profile = request.user.userprofile
-
     if request.method == 'POST':
         form = UserProfileForm(request.POST, instance=user_profile)
         if form.is_valid():
@@ -225,7 +222,7 @@ def cart(req):
         context = {'count': count, 'cart': cart_detail}
         return render(req, 'productweb/cart.html', context)
     except UserProfile.DoesNotExist:
-        pass
+        return render(req, 'app/no_profile.html')
 
 @login_required
 def add_cart(req, id):
@@ -266,13 +263,17 @@ def order(request):
         material = request.POST.get('material')
         message = request.POST.get('message')
         attachment = request.FILES.get('attachment')
+
+        status = 'รอดำเนินการ'
+
         order = Order.objects.create(
             user_profile=user_profile,
             name=name,
             category=category,
             material=material,
             message=message,
-            attachment=attachment
+            attachment=attachment,
+            status=status 
         )
         try:
             with transaction.atomic():
@@ -287,29 +288,147 @@ def order(request):
     return render(request, 'productweb/order.html')
 
 
+@login_required
 def order2(request):
+    if request.method == 'POST':
+        user_profile = request.user.userprofile  
+        name = request.POST.get('name')
+        category = request.POST.get('category')
+        material = request.POST.get('material')
+        message = request.POST.get('message')
+        attachment = request.FILES.get('attachment')
+
+        status = 'รอดำเนินการ'
+        
+        # บันทึกข้อมูลลงในฐานข้อมูล
+        order = Order.objects.create(
+            user_profile=user_profile,
+            name=name,
+            category=category,
+            material=material,
+            message=message,
+            attachment=attachment,
+            status=status 
+        )
+        # ให้ redirect ไปยังหน้า "preorder.html" เพื่อแสดงรายการ Order ทั้งหมด
+        return redirect('preorder')
     return render(request, 'productweb/order2.html')
+
+
+@login_required
 def order3(request):
+    if request.method == 'POST':
+        user_profile = request.user.userprofile  
+        name = request.POST.get('name')
+        category = request.POST.get('category')
+        material = request.POST.get('material')
+        message = request.POST.get('message')
+        attachment = request.FILES.get('attachment')
+
+        status = 'รอดำเนินการ'
+
+        order = Order.objects.create(
+            user_profile=user_profile,
+            name=name,
+            category=category,
+            material=material,
+            message=message,
+            attachment=attachment,
+            status=status 
+        )
+        return redirect('preorder') 
+
     return render(request, 'productweb/order3.html')
+
+@login_required
 def order4(request):
+    if request.method == 'POST':
+        user_profile = request.user.userprofile  
+        name = request.POST.get('name')
+        category = request.POST.get('category')
+        material = request.POST.get('material')
+        message = request.POST.get('message')
+        attachment = request.FILES.get('attachment')
+
+        status = 'รอดำเนินการ'
+
+        order = Order.objects.create(
+            user_profile=user_profile,
+            name=name,
+            category=category,
+            material=material,
+            message=message,
+            attachment=attachment,
+            status=status 
+        )
+        return redirect('preorder') 
+
     return render(request, 'productweb/order4.html')
+
+@login_required
 def order5(request):
+    if request.method == 'POST':
+        user_profile = request.user.userprofile  
+        name = request.POST.get('name')
+        category = request.POST.get('category')
+        material = request.POST.get('material')
+        message = request.POST.get('message')
+        attachment = request.FILES.get('attachment')
+
+        status = 'รอดำเนินการ'
+
+        order = Order.objects.create(
+            user_profile=user_profile,
+            name=name,
+            category=category,
+            material=material,
+            message=message,
+            attachment=attachment,
+            status=status 
+        )
+        return redirect('preorder') 
+
     return render(request, 'productweb/order5.html')
+
+@login_required
 def order6(request):
+    if request.method == 'POST':
+        user_profile = request.user.userprofile  
+        name = request.POST.get('name')
+        category = request.POST.get('category')
+        material = request.POST.get('material')
+        message = request.POST.get('message')
+        attachment = request.FILES.get('attachment')
+
+        status = 'รอดำเนินการ'
+
+        order = Order.objects.create(
+            user_profile=user_profile,
+            name=name,
+            category=category,
+            material=material,
+            message=message,
+            attachment=attachment,
+            status=status 
+        )
+        return redirect('preorder') 
+
     return render(request, 'productweb/order6.html')
 
 @login_required
 def preorder(request, order_id=None):
+    
     if order_id:
-        # If order_id is provided, redirect to track_order view
+
         return redirect('track_order', order_id=order_id)
     else:
-        # Fetch all orders for the current user
         current_user = request.user
         orders = Order.objects.filter(user_profile__user=current_user).order_by('-created_at')
         return render(request, 'productweb/preorder.html', {'orders': orders})
+    
 
-def delete_product(request, product_id):
+
+def delete_product_incart(request, product_id):
     cart_item = get_object_or_404(Detailcart, id=product_id)
     if request.method == 'POST':
         cart_item.delete()
@@ -318,6 +437,200 @@ def delete_product(request, product_id):
 
 
 
+def delete_product(request, product_id):
+    # หากมีการ POST คำขอการลบสินค้า
+    if request.method == 'POST':
+        # หากต้องการยืนยันการลบสินค้า
+        if 'confirm_delete' in request.POST:
+            product = get_object_or_404(Item, pk=product_id)
+            product.delete()
+            return redirect('products')  # ลิงก์กลับไปยังหน้ารายการสินค้าหลัก
+        else:
+            return redirect('products')  # หากยกเลิกการลบสินค้า กลับไปยังหน้ารายการสินค้า
+    else:
+        product = get_object_or_404(Item, pk=product_id)
+        return render(request, 'productweb/delete_product.html', {'product': product})
+
+########                   ระบบแชท           ################
+@login_required
+def send_message(request):
+    if request.method == 'POST':
+        content = request.POST.get('content')
+        if content:  # ตรวจสอบว่ามีข้อมูล content หรือไม่
+            admin_user = User.objects.filter(is_staff=True).first()
+            if admin_user:
+                admin_id = admin_user.id
+                # สร้างข้อความใหม่และบันทึกลงในฐานข้อมูล
+                message = Message.objects.create(sender=request.user.userprofile, receiver_id=admin_id, content=content)
+                message.save()
+                return redirect('chat')
+    return redirect('chat')
 
 
+
+@login_required
+def chat(request):
+    user = UserProfile.objects.get(user=request.user)
+    if request.method == "POST":
+        admin = User.objects.filter(is_superuser=True)
+        if admin:
+            sender = UserProfile.objects.get(user=request.user)
+
+            admin = User.objects.filter(is_superuser=True).first()
+            receiver = UserProfile.objects.get(user=admin)
+
+            content = request.POST.get("content")
+            message = Message(sender=sender,receiver=receiver,content=content)
+            message.save()
+    context = {
+    }
+    return render(request, 'app/chat.html', context)
+
+
+@login_required
+def chat_history(request, receiver_id):
+    # เรียกดูประวัติการแชทกับผู้ใช้ที่กำหนด
+    messages = Message.objects.filter(sender=request.user.userprofile, receiver_id=receiver_id) | Message.objects.filter(sender_id=receiver_id, receiver=request.user.userprofile)
+    context = {
+        'messages': messages
+    }
+    return render(request, 'app/chat_history.html', context)
+
+from django.contrib.auth.models import User
+
+@login_required
+def admin_chat_list(request):
+    user = UserProfile.objects.get(user=request.user)
+    unique_sender_ids = Message.objects.filter(receiver=user).values_list('sender', flat=True).distinct()
+    unique_senders = UserProfile.objects.filter(id__in=unique_sender_ids)
+    context = {
+        'chat_list': unique_senders
+    }
+    return render(request, 'admin/admin_chat_list.html', context)
+
+@login_required
+def admin_chat(request,id):
+    user = UserProfile.objects.get(user=request.user)
+    sender = UserProfile.objects.get(id=id)
+    if request.method == "POST":
+        content = request.POST.get("text")
+        message = Message(sender=user,receiver=sender,content=content)
+        message.save()
+    context = {
+        'sender' : sender,
+    }
+    return render(request, 'admin/admin_chat.html', context)
+
+def admin_messages(request,id):
+    user = UserProfile.objects.get(user=request.user)
+    sender = UserProfile.objects.get(id=id)
+    chat_list = Message.objects.filter(Q(sender=sender, receiver=user) | Q(sender=user, receiver=sender)).order_by('timestamp')
     
+    messages_data = list(chat_list.values('id', 'sender__first_name', 'receiver__first_name', 'content', 'timestamp'))
+    return JsonResponse({'messages': messages_data})
+
+def customer_messages(request):
+    user = UserProfile.objects.get(user=request.user)
+    chat_list = Message.objects.filter(Q(receiver=user) | Q(sender=user)).order_by('timestamp')
+    
+    messages_data = list(chat_list.values('id', 'sender__first_name', 'receiver__first_name', 'content', 'timestamp'))
+    return JsonResponse({'messages': messages_data})
+########                   ระบบแชท           ################
+
+@login_required
+def payment_tracking(request):
+    user = UserProfile.objects.get(user=request.user)
+    user_payments = Payment.objects.filter(user=user)
+    return render(request, 'app/payment_tracking.html', {'user_payments': user_payments})
+
+
+def create_payment(request,id):
+    order = get_object_or_404(Order, pk=id)
+    return render(request, 'admin/create_payment.html',{'order':order})
+
+def send_payment(request):
+    order = None
+    if request.method == "POST":
+        order_id = request.POST.get('order_id')
+        price = request.POST.get('price')
+        order = Order.objects.get(id=order_id)
+        payment = Payment(user=order.user_profile,order=order,price=price)
+        payment.save()
+        return redirect('payment_tracking')
+    return redirect('admin1')
+
+
+def get_order_payment(request,id):
+    order = get_object_or_404(Order, pk=id)
+    order_payment = Payment.objects.get(order=order)
+    return render(request, 'productweb/get_order_payment.html',{'order': order_payment})
+
+
+@login_required
+def payment_slip(request):
+    if request.method == "POST":
+        file = request.FILES.get('file')
+        id = request.POST.get('order_id')
+        try:
+            myorder = Payment.objects.get(pk=id)
+        except Payment.DoesNotExist:
+            raise Http404("การชำระเงินที่คุณค้นหาไม่มีอยู่")  # หรือสามารถจัดการผิดพลาดได้อย่างอื่น
+        myorder.image.save(file.name, file, save=True)
+        return redirect('payment_tracking')
+    
+
+@login_required
+def upload_payment_image(request):
+    if request.method == 'POST':
+        payment_id = request.POST.get('order_id')
+        image = request.FILES.get('image')  # ใช้ request.FILES.get() แทน request.FILES.getlist()
+        print("Payment ID:", payment_id)  # Debugging
+        print("Image File:", image)  # Debugging
+        if payment_id and image:  # ตรวจสอบว่ามี payment_id และไฟล์รูป
+                payment = Payment.objects.get(pk=payment_id)
+                payment.image = image  # กำหนดรูปใน Payment
+                payment.save()  # บันทึกการเปลี่ยนแปลง
+                return redirect('payment_tracking')
+    return redirect('payment_tracking')
+
+
+@login_required
+def delete_payment_image(request, payment_id):
+    try:
+        payment = Payment.objects.get(pk=payment_id)
+        if payment.image:
+            # ลบรูปภาพจาก storage
+            if os.path.exists(payment.image.path):
+                os.remove(payment.image.path)
+            # ลบค่าฟิลด์รูปภาพในโมเดล Payment
+            payment.image = None
+            payment.save()
+            return redirect('payment_tracking')
+        else:
+            # ไม่มีรูปภาพในใบชำระนี้
+            return HttpResponse("ไม่มีรูปภาพในใบชำระนี้")
+    except Payment.DoesNotExist:
+        # ไม่พบใบชำระที่ระบุ
+        raise Http404("ไม่พบการชำระเงินที่ระบุ")
+
+@login_required
+def update_payment_status(request):
+    if request.method == 'POST':
+        payment_id = request.POST.get('payment_id')
+        new_status = request.POST.get('status')
+        try:
+            payment = Payment.objects.get(pk=payment_id)
+        except Payment.DoesNotExist:
+            raise Http404("ไม่พบการชำระเงินที่ระบุ")
+        else:
+            payment.status = new_status
+            payment.save()
+            # ส่งกลับไปยังหน้าที่แสดงสถานะการชำระเงินของผู้ใช้
+            return redirect('payment_tracking')  # แก้จาก 'payment_list' เป็น 'payment_tracking'
+
+    # เรียกดูข้อมูลการชำระเงินทั้งหมด
+    payments = Payment.objects.all()
+    # ส่งข้อมูลการชำระเงินไปยังเทมเพลตเพื่อแสดงในหน้า HTML
+    return render(request, 'admin/payment_list.html', {'payments': payments})
+
+

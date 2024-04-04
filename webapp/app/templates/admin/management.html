@@ -8,16 +8,8 @@
     <link rel="stylesheet" href="{% static 'css/adminpage.css' %}">
 </head>
 <body>
-    <header>
-        <h1>Admin Panel</h1>
-    </header>
-    <nav>
-        <a href="{% url 'home' %}">หน้าหลัก</a>
-        <a href="{% url 'management' %}">จัดการผู้ใช้</a>
-        {% if order.id %}
-        <a href="{% url 'admin_update_order_status' order.id %}">รายงาน</a>
-        {% endif %}
-    </nav>
+    {% include 'admin/tab_admin.html' %}
+
     <br>
     <a href="{% url 'user_management' %}">User Management</a>
     

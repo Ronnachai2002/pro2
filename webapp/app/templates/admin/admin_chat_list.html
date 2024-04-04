@@ -1,0 +1,24 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Chat List</title>
+    <link rel="stylesheet" href="{% static 'css/adminpage2.css' %}">
+
+</head>
+<body>
+    {% include 'admin/tab_admin.html' %}
+
+    <h1>Admin Chat List</h1>
+    
+    <div id="chat-container">
+        {% for chat in chat_list %}
+        <div class="chat-item">
+            <a href="/admin_chat/{{ chat.id }}">{{ chat.first_name }} {{ chat.last_name }}</a>
+        </div>
+        {% endfor %}
+    </div>
+</body>
+</html>

@@ -63,5 +63,14 @@ a {
 a:hover {
     text-decoration: underline;
 }
+nav {
+    background-color: #555;
+    padding: 10px;
+}
 
-/* จบ CSS */
+nav a {
+    color: #fff;
+    text-decoration: none;
+    padding: 10px;
+    margin: 0 10px;
+}

@@ -37,7 +37,7 @@ urlpatterns = [
     path('contag/', contag, name='contag'),
     path('payments/', payments, name='payments'),
     path('add_product/', add_product, name='add_product'),
-    path('delete_product/<int:product_id>/', delete_product, name='delete_product'),
+    path('delete_product_incart/<int:product_id>/', delete_product_incart, name='delete_product_incart'),
     path('add_cart/<int:id>/', add_cart, name='add_cart'),
     path('cart/',cart,name='cart'),
     path('order',order,name='order'),
@@ -52,5 +52,28 @@ urlpatterns = [
     path('orders/update/<int:order_id>/', views.update_order_status, name='update_order_status'),
     path('orders/view/<int:order_id>/', views.view_order, name='view_order'),
     path('orders/track/<int:order_id>/', views.track_order, name='track_order'),
+    path('delete_product/<int:product_id>/delete/', views.delete_product, name='delete_product'),
+    path('chat', views.chat, name='chat'),
+    path('chat_history/<int:receiver_id>/', views.chat_history, name='chat_history'),
+    path('send_message/', views.send_message, name='send_message'),
+    path('admin_chat_list', views.admin_chat_list, name='admin_chat'),
+    path('admin_chat/<int:id>',views.admin_chat, name='delete_ScoreTopic'),
+    path('messages/admin/<int:id>', views.admin_messages, name='latest_messages'),
+    path('messages/customer/', views.customer_messages, name='latest_messages'),
+    path('payment-tracking/', payment_tracking, name='payment_tracking'),
+    path('create_payment/<int:id>', create_payment, name='create_payment'),
+    path('send_payment/', send_payment, name='send_payment'),
+    path('get_order_payment/<int:id>', get_order_payment, name='get_order_payment'),
+    path('payment_slip/', views.payment_slip, name='payment_slip'),
+    path('upload_payment_image/', views.upload_payment_image, name='upload_payment_image'),
+    path('update_payment_status/', views.update_payment_status, name='update_payment_status'),
+    path('delete_payment_image/<int:payment_id>/', views.delete_payment_image, name='delete_payment_image'),
+
+    
+
+
+
+
+
 
 ]

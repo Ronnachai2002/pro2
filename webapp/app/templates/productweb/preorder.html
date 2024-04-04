@@ -25,7 +25,7 @@
       </div>
       <div class="order-details">
         <div>
-          <label>ชื่อผู้สั่ง:</label> {{ order.user_profile.first_name }} {{ order.user_profile.last_name }}
+          <label>ชื่อผู้สั่ง:</label> {{ order.user_profile.user.first_name }} {{ order.user_profile.user.last_name }}
         </div>
         <div>
           <label>สถานะ:</label> {{ order.get_status_display }}
@@ -41,10 +41,10 @@
       </div>
       <div class="order-details">
         <div>
-          <label>แบบป้าย:</label> {{ order.get_material_display }}
-        </div>
-        <div>
-          <label>รายละเอียดเพิ่มเติม:</label> {{ order.message }}
+          <label>รายละเอียดเพิ่มเติม:</label>
+          <div class="message-content">
+            {{ order.message }}
+          </div>
         </div>
       </div>
       <div class="order-details">
